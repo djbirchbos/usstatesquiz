@@ -1,0 +1,24 @@
+<html>
+<head>
+</head>
+<body>
+    <form action="/post_results" method="post">
+        <label for="playername">Player Name:</label>
+        <input type="text" id="playername" name="playername" />
+        <br />
+    
+        <ul>
+            {% for question in questions %}
+                <label for="answer">What is the state capital of {{question.get_state_name()}}?</label>
+                <input type="text" name={{question.get_state_name_no_spaces()}} />
+                <br />
+                <br />
+            {% endfor %}
+        </ul>
+        
+        <input type="submit" value="Check answers"/>
+
+    </form>
+</form>
+</body>
+</html>

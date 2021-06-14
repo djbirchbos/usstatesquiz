@@ -11,13 +11,19 @@ Last time I ran this I used anaconda prompt:
     
     Then use browser to hit http://127.0.0.1:5000/form
 
-version works
+version works again
 
 """
 
 import random 
 import time 
 import pandas as pd
+from flask import Flask, request, render_template
+
+app = Flask(__name__)
+
+states = []
+answers = []
 
 class state():
     __state_name = ''
@@ -36,6 +42,9 @@ class state():
         
     def get_state_name(self):
         return self.__state_name
+    
+    def get_state_name_no_spaces(self):
+        return self.__state_name.replace(" ","")
     
     def get_capital(self):
         return self.__capital
@@ -77,9 +86,9 @@ class answer():
         return self.__answer
 
 
+@app.route("/form",methods=['GET','POST'])
 def main():
     # init variables and lists
-    states = []
     answers = []
     correct = False 
     score = 0
@@ -99,21 +108,22 @@ def main():
     # shuffle the list so its random each time
     random.shuffle(states)
     
+    return render_template('quiz.html', \
+                           num_questions = len(states),\
+                           questions = states )
+    
+
+
+@app.route('/post_results',methods=['GET','POST'])
+def check_results():    
+    score = 0
+    correct = False
+    
     # First lets test the state capitals..
     for us_state in states:
         
-        start = time.time()
-        
-        answer_entry = input("What is the state capital of " + 
-                             us_state.get_state_name() + "? ")
-        
-        # First check if ready to quit ...
-        if answer_entry == 'q':
-            correct = False 
-            break
-        
         # check answer
-        if answer_entry.upper() == us_state.get_capital().upper():
+        if str(request.form[us_state.get_state_name_no_spaces()]).upper() == us_state.get_capital().upper():
             score = score + 1
             correct = True 
     
@@ -121,23 +131,23 @@ def main():
         answers.append(answer(
             us_state.get_state_name(), 
             us_state.get_capital(), 
-            answer_entry, 
+            request.form[us_state.get_state_name_no_spaces()], 
             correct))
      
-    
-    # Tell user their score
-    print('Your score is:  ' + str(score) + 
-          ' and you took ' + 
-          str(time.time() - start)) 
     
     # Iterate through the results
     for result in answers:
         if result.get_correct() == False:
             print('The state capital of ' + result.get_question() + ' is not ' + result.get_answer())
+        
+    return render_template('results.html', \
+                           player_name = request.form['playername'], \
+                           num_correct = score,
+                           time_taken = 10)
+
     
 if __name__ == "__main__":
     main()
-    
 
 
 
