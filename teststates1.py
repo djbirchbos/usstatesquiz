@@ -22,7 +22,6 @@ from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
-states = []
 answers = []
 
 class state():
@@ -99,29 +98,17 @@ def main():
 
     """
     
-    # init variables and lists
-    answers = []
-    correct = False 
-    score = 0
-    
-    # pd.read_csv returns a numpy.ndarray
-    states_and_capitals = pd.read_csv('C:/Users/David/Documents/David Birch/Code Projects/Quiz/states.csv')
+    # Build a list of states
+    states = load_states('C:/Users/David/Documents/David Birch/Code Projects/Quiz/states.csv')
         
-    # Build a list of facts about states
-    for i in range(1, len(states_and_capitals.index)):
-        state_name = states_and_capitals['name'][i]
-        capital = states_and_capitals['description'][i]
-        latitude = states_and_capitals['latitude'][i]
-        longitude = states_and_capitals['longitude'][i]
-        
-        states.append(state(state_name, capital, latitude, longitude))
     
     # shuffle the list so its random each time
     random.shuffle(states)
     
     return render_template('quiz.html', \
                            num_questions = len(states),\
-                           questions = states )
+                           questions = states, \
+                           start_time = time.time())
     
 
 
@@ -138,6 +125,13 @@ def check_results():
     """
     score = 0
     correct = False
+    answers = []
+    
+    # Derive the time taken
+    time_taken = str(time.time() - float(request.form['start_time']))
+
+    # load the states
+    states = load_states('C:/Users/David/Documents/David Birch/Code Projects/Quiz/states.csv')
     
     # First lets test the state capitals..
     for us_state in states:
@@ -154,19 +148,45 @@ def check_results():
             request.form[us_state.get_state_name_no_spaces()], 
             correct))
      
-    
-    # Iterate through the results
-    for result in answers:
-        if result.get_correct() == False:
-            print('The state capital of ' + result.get_question() + ' is not ' + result.get_answer())
         
     return render_template('results.html', \
                            player_name = request.form['playername'], \
                            num_correct = score, \
                            num_questions = len(states), \
-                           time_taken = 10)
+                           time_taken = time_taken)
 
+
+def load_states(filename):
+    """
     
+
+    Parameters
+    ----------
+    filename : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    states : TYPE
+        DESCRIPTION.
+
+    """
+    states = []
+    
+     # pd.read_csv returns a numpy.ndarray
+    states_and_capitals = pd.read_csv(filename)
+
+    # Build a list of facts about states
+    for i in range(0, len(states_and_capitals.index)):
+        state_name = states_and_capitals['name'][i]
+        capital = states_and_capitals['description'][i]
+        latitude = states_and_capitals['latitude'][i]
+        longitude = states_and_capitals['longitude'][i]
+        
+        states.append(state(state_name, capital, latitude, longitude))
+    
+    return states    
+        
 if __name__ == "__main__":
     main()
 
