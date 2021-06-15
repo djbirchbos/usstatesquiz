@@ -56,6 +56,7 @@ class state():
         return self.__longitude
     
 class answer():
+    
     __question = ''
     __correct_answer = ''
     __answer = ''
@@ -88,6 +89,16 @@ class answer():
 
 @app.route("/form",methods=['GET','POST'])
 def main():
+    """
+    
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
+    
     # init variables and lists
     answers = []
     correct = False 
@@ -116,6 +127,15 @@ def main():
 
 @app.route('/post_results',methods=['GET','POST'])
 def check_results():    
+    """
+    
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
     score = 0
     correct = False
     
@@ -142,7 +162,8 @@ def check_results():
         
     return render_template('results.html', \
                            player_name = request.form['playername'], \
-                           num_correct = score,
+                           num_correct = score, \
+                           num_questions = len(states), \
                            time_taken = 10)
 
     
