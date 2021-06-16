@@ -126,6 +126,7 @@ def check_results():
     score = 0
     correct = False
     answers = []
+    wronganswers = []
     
     # Derive the time taken
     time_taken = str(time.time() - float(request.form['start_time']))
@@ -133,7 +134,7 @@ def check_results():
     # load the states
     states = load_states('C:/Users/David/Documents/David Birch/Code Projects/Quiz/states.csv')
     
-    # First lets test the state capitals..
+    # First let's test the state capitals...
     for us_state in states:
         
         # check answer
@@ -148,12 +149,15 @@ def check_results():
             request.form[us_state.get_state_name_no_spaces()], 
             correct))
      
+    # HTML doesn't support if statement so filter here so that incorrect answers can be displayed
+    wrong_answers = [result for result in answers if result.get_correct() is False] 
         
     return render_template('results.html', \
                            player_name = request.form['playername'], \
                            num_correct = score, \
                            num_questions = len(states), \
-                           time_taken = time_taken)
+                           time_taken = time_taken, \
+                           answers = wrong_answers)
 
 
 def load_states(filename):

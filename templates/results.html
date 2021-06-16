@@ -14,7 +14,13 @@
 
         
         <input type="submit" value="Play again"/>
-
+        <!-- I want to loop through results -->
+        <ul>
+            {% for answer in answers %}
+                <label for="result">The state capital of {{answer.get_question()}} is not {{answer.get_answer()}}.</label>
+                </br>
+            {% endfor %}
+        </ul>
     </form>
 </form>
 </body>
